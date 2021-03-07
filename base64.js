@@ -1,13 +1,6 @@
-// Utility functions
 
-// Code was written by Tyler Akins and is placed in the public domain
-// It would be nice if you left this header.  http://rumkin.com
-
-
-// Base64 key string
 var base64_keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
-// Wrapper for standard interface
 function Base64(encdec, textstr) {
    if (encdec > 0) {
       return base64_encode(textstr);
