@@ -1,13 +1,4 @@
-// Keymaker
-// Can be inserted into any page to generate one or more keys.
 
-// Code was written by Tyler Akins and is placed in the public domain.
-// It would be nice if you left this header.  http://rumkin.com
-
-
-// Call this function when the page finishes loading
-// It looks for elements with id='Keymaker0' id='Keymaker1' etc.
-// It adds the keymaker link to those elements.
 function Keymaker_Start()
 {
    var i = 0;
