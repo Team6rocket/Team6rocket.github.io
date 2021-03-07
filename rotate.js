@@ -1,13 +1,4 @@
-// Rotate Text
 
-// Algorithm suggested by Mike on the Kryptos mailing list.
-
-// Insert letters (not newlines) into a grid, then rotate the grid 90 degrees
-// left or right (left = encode) and read the results back out of the grid.
-// encdec = -1 for decode (right) and 1 for encode (left)
-// text = text to rotate
-// cols = number of columns for the box.  If not a factor of text length,
-//   adds 'X' characters
 function Rotate(encdec, text, cols)
 {
    var t2 = Tr(text, "\r\n");
