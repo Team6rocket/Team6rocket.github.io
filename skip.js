@@ -1,16 +1,4 @@
-// Skip
 
-// This code was written by Tyler Akins and placed in the public domain.
-// It would be nice if you left this header intact.  http://rumkin.com
-
-// Requires util.js
-
-
-// Skip
-// encdec = -1 for decode, 1 for encode
-// text = the data you want to encode/decode
-// inc = how many letters you want to skip (1 or more)
-// start = what position you want to start at (0 = beginning)
 function Skip(encdec, text, inc, start)
 {
    enctext = Tr(text, "\r\n");
