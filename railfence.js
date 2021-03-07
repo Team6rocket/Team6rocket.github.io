@@ -1,14 +1,4 @@
-// Railfence encoding
 
-// This code was written by Tyler Akins and placed in the public domain.
-// It would be nice if you left this header intact.  http://rumkin.com
-
-
-// Railfence
-// encdec = -1 for decode, 1 for encode
-// text = the text to encode/decode
-// rails = The number of rails in the fence ( >= 1 and <= text.length )
-// offset = Starting position (from 0 to rails * 2 - 2)
 function Railfence(encdec, text, rails, offset)
 {
    rails = rails * 1;
