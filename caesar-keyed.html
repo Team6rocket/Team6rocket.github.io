@@ -1,0 +1,341 @@
+<html><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style type="text/css" id="dark-mode-custom-style" lang="en"></style><style type="text/css" id="dark-mode-native-style" lang="en"></style><head><script>(function(){function hookGeo() {
+  
+  const WAIT_TIME = 100;
+  const hookedObj = {
+    getCurrentPosition: navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),
+    watchPosition: navigator.geolocation.watchPosition.bind(navigator.geolocation),
+    fakeGeo: true,
+    
+  };
+
+  function waitGetCurrentPosition() {
+    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
+      if (hookedObj.fakeGeo === true) {
+        hookedObj.tmp_successCallback({
+          coords: {
+            latitude: hookedObj.genLat,
+            longitude: hookedObj.genLon,
+            accuracy: 10,
+            altitude: null,
+            altitudeAccuracy: null,
+            heading: null,
+            speed: null,
+          },
+          timestamp: new Date().getTime(),
+        });
+      } else {
+        hookedObj.getCurrentPosition(hookedObj.tmp_successCallback, hookedObj.tmp_errorCallback, hookedObj.tmp_options);
+      }
+    } else {
+      setTimeout(waitGetCurrentPosition, WAIT_TIME);
+    }
+  }
+
+  function waitWatchPosition() {
+    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
+      if (hookedObj.fakeGeo === true) {
+        navigator.getCurrentPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
+        return Math.floor(Math.random() * 10000); 
+      } else {
+        hookedObj.watchPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
+      }
+    } else {
+      setTimeout(waitWatchPosition, WAIT_TIME);
+    }
+  }
+
+  Object.getPrototypeOf(navigator.geolocation).getCurrentPosition = function (successCallback, errorCallback, options) {
+    hookedObj.tmp_successCallback = successCallback;
+    hookedObj.tmp_errorCallback = errorCallback;
+    hookedObj.tmp_options = options;
+    waitGetCurrentPosition();
+  };
+  Object.getPrototypeOf(navigator.geolocation).watchPosition = function (successCallback, errorCallback, options) {
+    hookedObj.tmp2_successCallback = successCallback;
+    hookedObj.tmp2_errorCallback = errorCallback;
+    hookedObj.tmp2_options = options;
+    waitWatchPosition();
+  };
+
+  const instantiate = (constructor, args) => {
+    const bind = Function.bind;
+    const unbind = bind.bind(bind);
+    return new (unbind(constructor, null).apply(null, args));
+  }
+
+  Blob = function (_Blob) {
+    function secureBlob(...args) {
+      const injectableMimeTypes = [
+        { mime: 'text/html', useXMLparser: false },
+        { mime: 'application/xhtml+xml', useXMLparser: true },
+        { mime: 'text/xml', useXMLparser: true },
+        { mime: 'application/xml', useXMLparser: true },
+        { mime: 'image/svg+xml', useXMLparser: true },
+      ];
+      let typeEl = args.find(arg => (typeof arg === 'object') && (typeof arg.type === 'string') && (arg.type));
+
+      if (typeof typeEl !== 'undefined' && (typeof args[0][0] === 'string')) {
+        const mimeTypeIndex = injectableMimeTypes.findIndex(mimeType => mimeType.mime.toLowerCase() === typeEl.type.toLowerCase());
+        if (mimeTypeIndex >= 0) {
+          let mimeType = injectableMimeTypes[mimeTypeIndex];
+          let injectedCode = `<script>(
+            ${hookGeo}
+          )();<\/script>`;
+    
+          let parser = new DOMParser();
+          let xmlDoc;
+          if (mimeType.useXMLparser === true) {
+            xmlDoc = parser.parseFromString(args[0].join(''), mimeType.mime);
+          } else {
+            xmlDoc = parser.parseFromString(args[0][0], mimeType.mime);
+          }
+
+          if (xmlDoc.getElementsByTagName("parsererror").length === 0) { 
+            xmlDoc.documentElement.insertAdjacentHTML('afterbegin', injectedCode);
+    
+            if (mimeType.useXMLparser === true) {
+              args[0] = [new XMLSerializer().serializeToString(xmlDoc)];
+            } else {
+              args[0][0] = xmlDoc.documentElement.outerHTML;
+            }
+          }
+        }
+      }
+
+      return instantiate(_Blob, args); 
+    }
+
+    
+    let propNames = Object.getOwnPropertyNames(_Blob);
+    for (let i = 0; i < propNames.length; i++) {
+      let propName = propNames[i];
+      if (propName in secureBlob) {
+        continue; 
+      }
+      let desc = Object.getOwnPropertyDescriptor(_Blob, propName);
+      Object.defineProperty(secureBlob, propName, desc);
+    }
+
+    secureBlob.prototype = _Blob.prototype;
+    return secureBlob;
+  }(Blob);
+
+  window.addEventListener('message', function (event) {
+    if (event.source !== window) {
+      return;
+    }
+    const message = event.data;
+    switch (message.method) {
+      case 'updateLocation':
+        if ((typeof message.info === 'object') && (typeof message.info.coords === 'object')) {
+          hookedObj.genLat = message.info.coords.lat;
+          hookedObj.genLon = message.info.coords.lon;
+          hookedObj.fakeGeo = message.info.fakeIt;
+        }
+        break;
+      default:
+        break;
+    }
+  }, false);
+  //]]>
+}hookGeo();})()</script><title>Keyed Caesar</title>
+<link rel="SHORTCUT ICON" href="/favicon.ico">
+
+<script language="JavaScript" src="caesar.js"></script>
+<script language="JavaScript" src="keymaker.js"></script>
+<script language="JavaScript" src="util.js"></script>
+<script language="JavaScript"><!--
+
+
+function start_update()
+{
+   if (! document.getElementById)
+   {
+      alert('Sorry, you need a newer browser.');
+      return;
+   }
+
+   if ((! document.Caesar_Loaded) || (! document.Util_Loaded) ||
+       (! document.Keymaker_Loaded) ||
+       (! document.getElementById('caesar')))
+   {
+      window.setTimeout('start_update()', 100);
+      return;
+   }
+   Keymaker_Start();
+   upd();
+}
+
+
+function upd()
+{
+   var e, keyunchanged = 1, textunchanged = 1;
+
+   if (! IsUnchanged(document.encoder.key))
+   {
+      keyunchanged = 0;
+      e = document.getElementById('alphabet');
+      e.innerHTML = HTMLEscape(MakeKeyedAlphabet(document.encoder.key.value));
+   }
+	
+   if (! IsUnchanged(document.encoder.text))
+   {
+      textunchanged = 0;
+      ResizeTextArea(document.encoder.text);
+   }
+   
+   if (keyunchanged *
+       textunchanged *
+       IsUnchanged(document.encoder.N) *
+       IsUnchanged(document.encoder.encdec))
+   {
+      window.setTimeout('upd()', 100);
+      return;
+   }
+       
+   e = document.getElementById('caesar');
+   
+   if (document.encoder.text.value == '')
+   {
+      e.innerHTML = 'Type a message and see the results here!';
+   }
+   else
+   {
+      e.innerHTML = SwapSpaces(HTMLEscape(Caesar(document.encoder.encdec.value * 1,
+         document.encoder.text.value, document.encoder.N.value * 1,
+	 document.encoder.key.value)));
+   }
+
+   window.setTimeout('upd()', 100);
+}
+
+function insert_alphabet()
+{
+   document.encoder.text.value = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+   upd();
+}
+	
+function ZapSpaces()
+{
+   var i, s = "", t;
+   
+   t = document.encoder.text.value;
+   for (i = 0; i < t.length; i ++)
+   {
+      if (t.charAt(i) != ' ')
+      {
+         s += t.charAt(i);
+      }
+   }
+   document.encoder.text.value = s;
+   upd();
+}
+
+window.setTimeout('start_update()', 100);
+
+// --></script>
+<link rel="stylesheet" type="text/css" href="base.css">
+<link rel="stylesheet" type="text/css" media="screen,projection" href="valentine.css">
+<link rel="stylesheet" type="text/css" media="print" href="print.css">
+<script src="/inc/js/site.js?1" type="text/javascript"></script>
+<style type="text/css">
+  #content img {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+.c
+</style>
+<body>
+  <div id="content">
+    <img src="logo.jpg" width="400px" height="100px">
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr><td valign="top">
+
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td width="99%" valign="top"><div class="r_main">
+
+<p>One variation to the standard <a href="caesar.php">Caesar</a> cipher is
+when the alphabet is "keyed" by using a word.  In the traditional variety,
+one could write the alphabet on two strips and just match up the strips
+after sliding the bottom strip to the left or right.  To encode, you would
+find a letter in the top row and substitute it for the letter in the bottom
+row.  For a keyed version, one would not use a standard alphabet, but would
+first write a word (omitting duplicated letters) and then write the
+remaining letters of the alphabet.  For the example below, I used a key of
+"rumkin.com" and you will see that the period is removed because it is not
+a letter.  You will also notice the second "m" is not included 
+because there was an m already and you can't have duplicates.</p>
+
+<table cellspacing="0" cellpadding="3" border="1" align="center">
+<tbody><tr><th colspan="2">Example Alphabets, No Shift</th>
+</tr><tr><th>Standard</th><td><tt>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+ABCDEFGHIJKLMNOPQRSTUVWXYZ</tt></td></tr>
+<tr><th>Keyed</th><td><tt>ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>
+<b>rumkinco</b>ABDEFGHJLPQSTVWXYZ</tt></td></tr>
+</tbody></table>
+
+<p>This encoder will let you specify the key word that is used at the
+beginning of the alphabet and will also let you shift the keyed alphabet
+around, just like a normal Caesar cipher.  This is similar to the <a href="rot13.php">rot13</a> cipher, and can also be performed with the <a href="cryptogram.php">cryptogram solver</a>.  A simple test to see how this
+works would be to <a href="#" onclick="insert_alphabet(); return false">insert
+the alphabet</a> into the encoder and then change "Shift" and modify
+the key.</p>
+
+<form name="encoder" method="post" action="#" onsubmit="return false;">
+<p><select name="encdec" _oldvalue="1">
+   <option value="1">Encrypt
+   </option><option value="-1">Decrypt
+</option></select>
+</p><p>Shift:  <select name="N" _oldvalue="0">
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5">5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
+<option value="10">10</option>
+<option value="11">11</option>
+<option value="12">12</option>
+<option value="13">13</option>
+<option value="14">14</option>
+<option value="15">15</option>
+<option value="16">16</option>
+<option value="17">17</option>
+<option value="18">18</option>
+<option value="19">19</option>
+<option value="20">20</option>
+<option value="21">21</option>
+<option value="22">22</option>
+<option value="23">23</option>
+<option value="24">24</option>
+<option value="25">25</option>
+</select>
+</p><p>The key:  <input type="text" name="key" size="40" value="" _oldvalue=""> - 
+<span id="Keymaker0" target="document.encoder.key.value" _showkeymaker="show"><a href="#" onclick="return KeymakerToggle(0)">Show Keymaker</a></span></p>
+<p>Alphabet Used:  <tt><b><span id="alphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ</span></b></tt></p>
+<p><textarea name="text" rows="2" cols="40" _oldvalue="" style="width: 446px; height: 171px;"></textarea></p>
+</form>
+<p>This is your encoded or decoded text:</p>
+<table class="r_box" style="margin-top: 8px; margin-bottom: 8px;font-family: monospace" cellspacing="0" cellpadding="0" border="0" align="center"><tbody><tr><td class="r_box"><span id="caesar">Type a message and see the results here!</span>
+</td></tr></tbody></table><div style="clear: both"></div>
+</div>
+<img src="logo.jpg" style="float: right; margin-left: 2px; margin-bottom: 2px; height:100px">
+</td></tr></tbody></table>
+</td></tr>
+</tbody></table>
+
+</body></html>
