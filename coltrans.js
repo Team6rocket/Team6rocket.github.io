@@ -1,17 +1,4 @@
-// Columnar Transposition
 
-// Requires util.js
-
-// Code was written by Tyler Akins and is placed in the public domain
-// It would be nice if you left this header.  http://rumkin.com
-
-
-// Perform a Columnar Transposition
-// encdec is 1 for encode, -1 for decode
-// text is what you want encrypted/decrypted
-// key is the columnar key that you wish to use.  It must contain all
-//   of the numbers from 1 to N only once in any order you want.  Use
-//   MakeColumnKey() to generate it!
 function ColTrans(encdec, text, key)
 {
    var NumberList = ColTrans_Split(key)
