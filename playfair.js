@@ -1,18 +1,4 @@
-// Playfair Cipher
 
-// This code was written by Tyler Akins and is placed in the public domain.
-// It would be nice if this header remained intact.  http://rumkin.com
-
-// Requires util.js
-
-
-// Performs a Playfair cipher on the passed-in text
-// encdec = -1 for decode, 1 for encode
-// text = the text to encode/decode
-// skip = the letter omitted from the 5x5 grid
-// skipto = what the "skip" letter should be replaced with
-// key = the word or phrase used to generate letter placement in the 5x5 grid
-// flags = 0x01 : Double letters are unencoded
 function Playfair(encdec, text, skip, skipto, key, flags)
 {
    var enc, out, bet, otemp, c;
