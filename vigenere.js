@@ -1,16 +1,4 @@
-// Vigenere text cipher
 
-// Code written by Tyler Akins and placed in the public domain.
-// It would be nice if you left this header intact.  http://rumkin.com
-
-// Requires util.js
-
-
-// Vigenere encrypt text
-// encdec = 1 to encode, -1 to decode
-// text = the text you want to encode
-// pass = the password to use
-// key = the key to make a keyed alphabet (or leave it blank)
 function Vigenere(encdec, text, pass, key, autokey)
 {
    var s, b, i;
