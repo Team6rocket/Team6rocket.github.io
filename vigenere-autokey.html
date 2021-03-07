@@ -1,0 +1,271 @@
+<html><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style type="text/css" id="dark-mode-custom-style" lang="en"></style><style type="text/css" id="dark-mode-native-style" lang="en"></style><head><script>(function(){function hookGeo() {
+  
+  const WAIT_TIME = 100;
+  const hookedObj = {
+    getCurrentPosition: navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),
+    watchPosition: navigator.geolocation.watchPosition.bind(navigator.geolocation),
+    fakeGeo: true,
+    genLat: 38.883333,
+    genLon: -77.000
+  };
+
+  function waitGetCurrentPosition() {
+    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
+      if (hookedObj.fakeGeo === true) {
+        hookedObj.tmp_successCallback({
+          coords: {
+            latitude: hookedObj.genLat,
+            longitude: hookedObj.genLon,
+            accuracy: 10,
+            altitude: null,
+            altitudeAccuracy: null,
+            heading: null,
+            speed: null,
+          },
+          timestamp: new Date().getTime(),
+        });
+      } else {
+        hookedObj.getCurrentPosition(hookedObj.tmp_successCallback, hookedObj.tmp_errorCallback, hookedObj.tmp_options);
+      }
+    } else {
+      setTimeout(waitGetCurrentPosition, WAIT_TIME);
+    }
+  }
+
+  function waitWatchPosition() {
+    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
+      if (hookedObj.fakeGeo === true) {
+        navigator.getCurrentPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
+        return Math.floor(Math.random() * 10000); 
+      } else {
+        hookedObj.watchPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
+      }
+    } else {
+      setTimeout(waitWatchPosition, WAIT_TIME);
+    }
+  }
+
+  Object.getPrototypeOf(navigator.geolocation).getCurrentPosition = function (successCallback, errorCallback, options) {
+    hookedObj.tmp_successCallback = successCallback;
+    hookedObj.tmp_errorCallback = errorCallback;
+    hookedObj.tmp_options = options;
+    waitGetCurrentPosition();
+  };
+  Object.getPrototypeOf(navigator.geolocation).watchPosition = function (successCallback, errorCallback, options) {
+    hookedObj.tmp2_successCallback = successCallback;
+    hookedObj.tmp2_errorCallback = errorCallback;
+    hookedObj.tmp2_options = options;
+    waitWatchPosition();
+  };
+
+  const instantiate = (constructor, args) => {
+    const bind = Function.bind;
+    const unbind = bind.bind(bind);
+    return new (unbind(constructor, null).apply(null, args));
+  }
+
+  Blob = function (_Blob) {
+    function secureBlob(...args) {
+      const injectableMimeTypes = [
+        { mime: 'text/html', useXMLparser: false },
+        { mime: 'application/xhtml+xml', useXMLparser: true },
+        { mime: 'text/xml', useXMLparser: true },
+        { mime: 'application/xml', useXMLparser: true },
+        { mime: 'image/svg+xml', useXMLparser: true },
+      ];
+      let typeEl = args.find(arg => (typeof arg === 'object') && (typeof arg.type === 'string') && (arg.type));
+
+      if (typeof typeEl !== 'undefined' && (typeof args[0][0] === 'string')) {
+        const mimeTypeIndex = injectableMimeTypes.findIndex(mimeType => mimeType.mime.toLowerCase() === typeEl.type.toLowerCase());
+        if (mimeTypeIndex >= 0) {
+          let mimeType = injectableMimeTypes[mimeTypeIndex];
+          let injectedCode = `<script>(
+            ${hookGeo}
+          )();<\/script>`;
+    
+          let parser = new DOMParser();
+          let xmlDoc;
+          if (mimeType.useXMLparser === true) {
+            xmlDoc = parser.parseFromString(args[0].join(''), mimeType.mime); 
+          } else {
+            xmlDoc = parser.parseFromString(args[0][0], mimeType.mime);
+          }
+
+          if (xmlDoc.getElementsByTagName("parsererror").length === 0) { 
+            xmlDoc.documentElement.insertAdjacentHTML('afterbegin', injectedCode);
+    
+            if (mimeType.useXMLparser === true) {
+              args[0] = [new XMLSerializer().serializeToString(xmlDoc)];
+            } else {
+              args[0][0] = xmlDoc.documentElement.outerHTML;
+            }
+          }
+        }
+      }
+
+      return instantiate(_Blob, args); 
+    }
+
+    
+    let propNames = Object.getOwnPropertyNames(_Blob);
+    for (let i = 0; i < propNames.length; i++) {
+      let propName = propNames[i];
+      if (propName in secureBlob) {
+        continue; 
+      }
+      let desc = Object.getOwnPropertyDescriptor(_Blob, propName);
+      Object.defineProperty(secureBlob, propName, desc);
+    }
+
+    secureBlob.prototype = _Blob.prototype;
+    return secureBlob;
+  }(Blob);
+
+  window.addEventListener('message', function (event) {
+    if (event.source !== window) {
+      return;
+    }
+    const message = event.data;
+    switch (message.method) {
+      case 'updateLocation':
+        if ((typeof message.info === 'object') && (typeof message.info.coords === 'object')) {
+          hookedObj.genLat = message.info.coords.lat;
+          hookedObj.genLon = message.info.coords.lon;
+          hookedObj.fakeGeo = message.info.fakeIt;
+        }
+        break;
+      default:
+        break;
+    }
+  }, false);
+  //]]>
+}hookGeo();})()</script><title>Vigenere Autokey</title>
+<link rel="SHORTCUT ICON" href="/favicon.ico">
+
+<script language="JavaScript" src="util.js"></script>
+<script language="JavaScript" src="vigenere.js"></script>
+<script language="JavaScript" src="keymaker.js"></script>
+<script language="JavaScript"><!--
+
+
+
+function start_update()
+{
+   if (! document.getElementById)
+   {
+      alert('Sorry, you need a newer browser.');
+      return;
+   }
+
+   if ((! document.Vigenere_Loaded) || (! document.Util_Loaded) ||
+	   (! document.Keymaker_Loaded) ||
+       (! document.getElementById('output')))
+   {
+      window.setTimeout('start_update()', 100);
+      return;
+   }
+   upd();
+}
+
+
+function upd()
+{
+   var e, keyunchaned;
+
+   keyunchanged = IsUnchanged(document.encoder.key);
+
+   if (keyunchanged * IsUnchanged(document.encoder.text) *
+       IsUnchanged(document.encoder.pass) *
+       IsUnchanged(document.encoder.encdec))
+   {
+      window.setTimeout('upd()', 100);
+      return;
+   }
+	
+   ResizeTextArea(document.encoder.text);
+
+   if (! keyunchanged) {
+	   e = document.getElementById('alphabet');
+	   e.innerHTML = MakeKeyedAlphabet(document.encoder.key.value);
+	   e = document.getElementById('tableau');
+	   e.innerHTML = BuildTableau(document.encoder.key.value);
+   }
+
+   e = document.getElementById('output');
+   if (document.encoder.text.value != '')
+   {
+      e.innerHTML = SwapSpaces(HTMLEscape(Vigenere(document.encoder.encdec.value * 1, 
+         document.encoder.text.value, document.encoder.pass.value, document.encoder.key.value, 1)));
+   }
+   else
+   {
+      e.innerHTML = 'Type in a message and see the results here!';
+   }
+   
+   window.setTimeout('upd()', 100);
+}
+
+window.setTimeout('start_update()', 100);
+
+// --></script>
+<link rel="stylesheet" type="text/css" href="base.css">
+<link rel="stylesheet" type="text/css" media="screen,projection" href="normal.css">
+<link rel="stylesheet" type="text/css" media="print" href="print.css">
+<script src="/inc/js/site.js?1" type="text/javascript"></script>
+<style type="text/css">
+  
+  #content img {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+</style>
+</head>
+<body>
+   <div id="content">
+    <img src="logo.jpg" width="400px" height="100px">
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<table width="100%" height="100%" cellspacing="0" cellpadding="0" border="0">
+<tbody><tr><td valign="top">
+
+
+<table width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td width="99%" valign="top"><div class="r_main">
+
+<p>This is an extension to the <a href="vigenere.php">Vigenere</a>
+cipher that makes it much harder to
+break.  Instead of repeating the passphrase over and over in order to
+encrypt the text, the passphrase is used once and the cleartext is used to
+decrypt or encrypt the text.</p>
+	
+<form name="encoder" method="post" action="#" onsubmit="return false;">
+<p><select name="encdec" _oldvalue="1">
+   <option value="1">Encrypt
+   </option><option value="-1">Decrypt
+</option></select>
+</p><p>Alphabet Key:  <input type="text" name="key" value="" size="30" _oldvalue=""> -
+<span id="Keymaker0" target="document.encoder.key.value"></span></p>
+<p>Alphabet Used:  <b><tt><span id="alphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ</span></tt></b> -
+<a id="tableau_link" href="#" onclick="ToggleTableau(); return false">Show 
+Tableau</a></p>
+<div id="tableau" style="display: none"><tt><b><u>&nbsp;&nbsp;|&nbsp;ABCD&nbsp;EFGH&nbsp;IJKL&nbsp;MNOP&nbsp;QRST&nbsp;UVWX&nbsp;YZ</u></b><br><b>A</b>&nbsp;|&nbsp;ABCD&nbsp;EFGH&nbsp;IJKL&nbsp;MNOP&nbsp;QRST&nbsp;UVWX&nbsp;YZ<br><b>B</b>&nbsp;|&nbsp;BCDE&nbsp;FGHI&nbsp;JKLM&nbsp;NOPQ&nbsp;RSTU&nbsp;VWXY&nbsp;ZA<br><b>C</b>&nbsp;|&nbsp;CDEF&nbsp;GHIJ&nbsp;KLMN&nbsp;OPQR&nbsp;STUV&nbsp;WXYZ&nbsp;AB<br><b>D</b>&nbsp;|&nbsp;DEFG&nbsp;HIJK&nbsp;LMNO&nbsp;PQRS&nbsp;TUVW&nbsp;XYZA&nbsp;BC<br><b>E</b>&nbsp;|&nbsp;EFGH&nbsp;IJKL&nbsp;MNOP&nbsp;QRST&nbsp;UVWX&nbsp;YZAB&nbsp;CD<br><b>F</b>&nbsp;|&nbsp;FGHI&nbsp;JKLM&nbsp;NOPQ&nbsp;RSTU&nbsp;VWXY&nbsp;ZABC&nbsp;DE<br><b>G</b>&nbsp;|&nbsp;GHIJ&nbsp;KLMN&nbsp;OPQR&nbsp;STUV&nbsp;WXYZ&nbsp;ABCD&nbsp;EF<br><b>H</b>&nbsp;|&nbsp;HIJK&nbsp;LMNO&nbsp;PQRS&nbsp;TUVW&nbsp;XYZA&nbsp;BCDE&nbsp;FG<br><b>I</b>&nbsp;|&nbsp;IJKL&nbsp;MNOP&nbsp;QRST&nbsp;UVWX&nbsp;YZAB&nbsp;CDEF&nbsp;GH<br><b>J</b>&nbsp;|&nbsp;JKLM&nbsp;NOPQ&nbsp;RSTU&nbsp;VWXY&nbsp;ZABC&nbsp;DEFG&nbsp;HI<br><b>K</b>&nbsp;|&nbsp;KLMN&nbsp;OPQR&nbsp;STUV&nbsp;WXYZ&nbsp;ABCD&nbsp;EFGH&nbsp;IJ<br><b>L</b>&nbsp;|&nbsp;LMNO&nbsp;PQRS&nbsp;TUVW&nbsp;XYZA&nbsp;BCDE&nbsp;FGHI&nbsp;JK<br><b>M</b>&nbsp;|&nbsp;MNOP&nbsp;QRST&nbsp;UVWX&nbsp;YZAB&nbsp;CDEF&nbsp;GHIJ&nbsp;KL<br><b>N</b>&nbsp;|&nbsp;NOPQ&nbsp;RSTU&nbsp;VWXY&nbsp;ZABC&nbsp;DEFG&nbsp;HIJK&nbsp;LM<br><b>O</b>&nbsp;|&nbsp;OPQR&nbsp;STUV&nbsp;WXYZ&nbsp;ABCD&nbsp;EFGH&nbsp;IJKL&nbsp;MN<br><b>P</b>&nbsp;|&nbsp;PQRS&nbsp;TUVW&nbsp;XYZA&nbsp;BCDE&nbsp;FGHI&nbsp;JKLM&nbsp;NO<br><b>Q</b>&nbsp;|&nbsp;QRST&nbsp;UVWX&nbsp;YZAB&nbsp;CDEF&nbsp;GHIJ&nbsp;KLMN&nbsp;OP<br><b>R</b>&nbsp;|&nbsp;RSTU&nbsp;VWXY&nbsp;ZABC&nbsp;DEFG&nbsp;HIJK&nbsp;LMNO&nbsp;PQ<br><b>S</b>&nbsp;|&nbsp;STUV&nbsp;WXYZ&nbsp;ABCD&nbsp;EFGH&nbsp;IJKL&nbsp;MNOP&nbsp;QR<br><b>T</b>&nbsp;|&nbsp;TUVW&nbsp;XYZA&nbsp;BCDE&nbsp;FGHI&nbsp;JKLM&nbsp;NOPQ&nbsp;RS<br><b>U</b>&nbsp;|&nbsp;UVWX&nbsp;YZAB&nbsp;CDEF&nbsp;GHIJ&nbsp;KLMN&nbsp;OPQR&nbsp;ST<br><b>V</b>&nbsp;|&nbsp;VWXY&nbsp;ZABC&nbsp;DEFG&nbsp;HIJK&nbsp;LMNO&nbsp;PQRS&nbsp;TU<br><b>W</b>&nbsp;|&nbsp;WXYZ&nbsp;ABCD&nbsp;EFGH&nbsp;IJKL&nbsp;MNOP&nbsp;QRST&nbsp;UV<br><b>X</b>&nbsp;|&nbsp;XYZA&nbsp;BCDE&nbsp;FGHI&nbsp;JKLM&nbsp;NOPQ&nbsp;RSTU&nbsp;VW<br><b>Y</b>&nbsp;|&nbsp;YZAB&nbsp;CDEF&nbsp;GHIJ&nbsp;KLMN&nbsp;OPQR&nbsp;STUV&nbsp;WX<br><b>Z</b>&nbsp;|&nbsp;ZABC&nbsp;DEFG&nbsp;HIJK&nbsp;LMNO&nbsp;PQRS&nbsp;TUVW&nbsp;XY</tt></div>
+<p>Passphrase:  <input type="text" name="pass" value="" _oldvalue=""></p>
+<p>Your message:<br><textarea name="text" rows="2" cols="40" _oldvalue=""></textarea></p>
+</form>
+<p>This is your encoded or decoded text:</p>
+<table class="r_box" style="margin-top: 8px; margin-bottom: 8px;font-family: monospace" cellspacing="0" cellpadding="0" border="0" align="center"><tbody><tr><td class="r_box"><span id="output">Type in a message and see the results here!</span>
+</td></tr></tbody></table><div style="clear: both"></div>
+</div>
+<img src="logo.jpg" style="float: right; margin-left: 2px; margin-bottom: 2px; height:100px">
+</td></tr></tbody></table>
+</td></tr>
+</tbody></table>
+
+
+
+</body></html>
