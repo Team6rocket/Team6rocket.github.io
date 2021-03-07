@@ -1,10 +1,4 @@
-// Utility functions
 
-// Code was written by Tyler Akins and is placed in the public domain
-// It would be nice if you left this header.  http://rumkin.com
-
-
-// Remove whitespace from beginning and end of text
 function Trim(s)
 {
    while (s.length && " \t\r\n".indexOf(s.charAt(0)) >= 0)
@@ -20,10 +14,7 @@ function Trim(s)
 }
 
 
-// Exchange characters in F for ones in T for the string S.  If T is not
-// specified or not long enough, the characters are removed.
-// "aaabbbC!!" = Tr("AaaBbbCcc", "ABc", "ab!")
-// "Test thing" = Tr("Test\n thing", "\r\n")
+
 function Tr(s, f, t)
 {
    var o = '';
@@ -54,9 +45,7 @@ function Tr(s, f, t)
 }
 
 
-// Insert CR and LF characters into e, based on the position of those
-// characters in T.
-// If T = "ab\ncd" and E = "zyxw", the result will be "zy\nxw"
+
 function InsertCRLF(t, e)
 {
    var o = "", i, j;
@@ -77,11 +66,6 @@ function InsertCRLF(t, e)
 }
 
 
-// Returns an alphabet with a key in front.
-// Passing the key of "Four. Score! And Seven Days Ago?"
-// will return  "FOURSCEANDVYGBHIJKLMPQTWXZ"
-// key = the letters to include in the beginning
-// alphaet = the alphabet to use (if not A-Z)
 function MakeKeyedAlphabet(key, alphabet)
 {
    var out = "";
@@ -108,7 +92,6 @@ function MakeKeyedAlphabet(key, alphabet)
 }
 
 
-// Make any string contain just alpha characters
 function OnlyAlpha(str)
 {
    var out = "";
@@ -227,16 +210,6 @@ function Reverse_String(s)
 }
 
 
-// Returns 1 if there was no change, 0 if it is not the same
-// Saves value in the element if it was changed, so subsequent calls
-// to this function will return 1 until it changes again.
-// Don't use this function like this:
-//   if (IsUnchanged(x) && IsUnchanged(y) && IsUnchanged(z)) { ... }
-// The logic code could short-circuit on X or Z (depending on how it
-// gets parsed) and will jump to the 'if' block without evaluating
-// all of the variables.  Use this instead:
-//   if (IsUnchanged(x) * IsUnchanged(y) * IsUnchanged(z)) { ... }
-//   if (IsUnchanged(x) + IsUnchanged(y) + IsUnchanged(z) == 3) { ... }
 function IsUnchanged(e)
 {
    var v;
