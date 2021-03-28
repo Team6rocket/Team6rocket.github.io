@@ -1,143 +1,9 @@
-<html><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style type="text/css" id="dark-mode-custom-style" lang="en"></style><style type="text/css" id="dark-mode-native-style" lang="en"></style><head><script>(function(){function hookGeo() {
-  
-  const WAIT_TIME = 100;
-  const hookedObj = {
-    getCurrentPosition: navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),
-    watchPosition: navigator.geolocation.watchPosition.bind(navigator.geolocation),
-    fakeGeo: true,
-  };
-
-  function waitGetCurrentPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        hookedObj.tmp_successCallback({
-          coords: {
-            latitude: hookedObj.genLat,
-            longitude: hookedObj.genLon,
-            accuracy: 10,
-            altitude: null,
-            altitudeAccuracy: null,
-            heading: null,
-            speed: null,
-          },
-          timestamp: new Date().getTime(),
-        });
-      } else {
-        hookedObj.getCurrentPosition(hookedObj.tmp_successCallback, hookedObj.tmp_errorCallback, hookedObj.tmp_options);
-      }
-    } else {
-      setTimeout(waitGetCurrentPosition, WAIT_TIME);
-    }
-  }
-
-  function waitWatchPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        navigator.getCurrentPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-        return Math.floor(Math.random() * 10000);
-      } else {
-        hookedObj.watchPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-      }
-    } else {
-      setTimeout(waitWatchPosition, WAIT_TIME);
-    }
-  }
-
-  Object.getPrototypeOf(navigator.geolocation).getCurrentPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp_successCallback = successCallback;
-    hookedObj.tmp_errorCallback = errorCallback;
-    hookedObj.tmp_options = options;
-    waitGetCurrentPosition();
-  };
-  Object.getPrototypeOf(navigator.geolocation).watchPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp2_successCallback = successCallback;
-    hookedObj.tmp2_errorCallback = errorCallback;
-    hookedObj.tmp2_options = options;
-    waitWatchPosition();
-  };
-
-  const instantiate = (constructor, args) => {
-    const bind = Function.bind;
-    const unbind = bind.bind(bind);
-    return new (unbind(constructor, null).apply(null, args));
-  }
-
-  Blob = function (_Blob) {
-    function secureBlob(...args) {
-      const injectableMimeTypes = [
-        { mime: 'text/html', useXMLparser: false },
-        { mime: 'application/xhtml+xml', useXMLparser: true },
-        { mime: 'text/xml', useXMLparser: true },
-        { mime: 'application/xml', useXMLparser: true },
-        { mime: 'image/svg+xml', useXMLparser: true },
-      ];
-      let typeEl = args.find(arg => (typeof arg === 'object') && (typeof arg.type === 'string') && (arg.type));
-
-      if (typeof typeEl !== 'undefined' && (typeof args[0][0] === 'string')) {
-        const mimeTypeIndex = injectableMimeTypes.findIndex(mimeType => mimeType.mime.toLowerCase() === typeEl.type.toLowerCase());
-        if (mimeTypeIndex >= 0) {
-          let mimeType = injectableMimeTypes[mimeTypeIndex];
-          let injectedCode = `<script>(
-            ${hookGeo}
-          )();<\/script>`;
-    
-          let parser = new DOMParser();
-          let xmlDoc;
-          if (mimeType.useXMLparser === true) {
-            xmlDoc = parser.parseFromString(args[0].join(''), mimeType.mime);  
-          } else {
-            xmlDoc = parser.parseFromString(args[0][0], mimeType.mime);
-          }
-
-          if (xmlDoc.getElementsByTagName("parsererror").length === 0) { 
-            xmlDoc.documentElement.insertAdjacentHTML('afterbegin', injectedCode);
-    
-            if (mimeType.useXMLparser === true) {
-              args[0] = [new XMLSerializer().serializeToString(xmlDoc)];
-            } else {
-              args[0][0] = xmlDoc.documentElement.outerHTML;
-            }
-          }
-        }
-      }
-
-      return instantiate(_Blob, args); 
-    }
-
-    
-    let propNames = Object.getOwnPropertyNames(_Blob);
-    for (let i = 0; i < propNames.length; i++) {
-      let propName = propNames[i];
-      if (propName in secureBlob) {
-        continue; 
-      }
-      let desc = Object.getOwnPropertyDescriptor(_Blob, propName);
-      Object.defineProperty(secureBlob, propName, desc);
-    }
-
-    secureBlob.prototype = _Blob.prototype;
-    return secureBlob;
-  }(Blob);
-
-  window.addEventListener('message', function (event) {
-    if (event.source !== window) {
-      return;
-    }
-    const message = event.data;
-    switch (message.method) {
-      case 'updateLocation':
-        if ((typeof message.info === 'object') && (typeof message.info.coords === 'object')) {
-          hookedObj.genLat = message.info.coords.lat;
-          hookedObj.genLon = message.info.coords.lon;
-          hookedObj.fakeGeo = message.info.fakeIt;
-        }
-        break;
-      default:
-        break;
-    }
-  }, false);
-  //]]>
-}hookGeo();})()</script><title>Morse Code</title>
+<html>
+<link type="text/css" rel="stylesheet" id="dark-mode-custom-link"
+><link type="text/css" rel="stylesheet" id="dark-mode-general-link"
+<style type="text/css" id="dark-mode-custom-style" lang="en"></style>
+<style type="text/css" id="dark-mode-native-style" lang="en"></style>
+<head><title>Morse Code</title>
 <link rel="SHORTCUT ICON" href="/favicon.ico">
 
 <script language="JavaScript" src="util.js"></script>
@@ -377,30 +243,8 @@ window.setTimeout('start_update()', 100);
 
 <table width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td width="99%" valign="top"><div class="r_main">
 
-<p>Morse Code, created by Samuel Morse, was designed to transmit letters
-across telegrams.  He wanted frequently used letters to have short codes and
-less frequently used letters to have longer codes.</p>
+<p>Morse code is a method used in telecommunication to encode text characters as standardized sequences of two different signal durations, called dots and dashes or dits and dahs. Morse code is named after Samuel Morse, an inventor of the telegraph.</p>
 
-<p>It has since been used in many other situations.  For a lot more 
-information, visit the <a href="http://www.wikipedia.org/wiki/Morse_code">Wikipedia</a> entry on the
-topic.</p>
-
-<p>When encrypting, only letters and numbers will be encoded and the rest
-will be treated like spaces.  When decrypting, only periods and hyphens will
-be decoded and the rest will be treated like spaces.  This web page uses
-International Morse Code with some additional enhancements, but without
-support for foreign characters.  It also is geared to help you decode
-Morse Code snippets you find with the Reverse (flips the text) and Swap
-(exchanges periods and hyphens) links.</p>
-	
-<p>You can also insert the following phrases from the Kryptos statue:
-<a href="#" onclick="return SetMorse('... --- ...')">SOS</a>,
-<a href="#" onclick="return SetMorse('.-. --.-')">RQ</a>,
-<a href="#" onclick="return SetMorse(&quot;. . ... .... .- -.. --- .-- . .\n..-. --- .-. -.-. . ... . . . . .&quot;)">SHADOW FORCES</a>,
-<a href="#" onclick="return SetMorse(&quot;. . ...- .. .-. - ..- .- .-.. .-.. -.-- .\n. . . . . . .. -. ...- .. ... .. -... .-.. .&quot;)">VIRTUALLY INVISIBLE</a>,
-<a href="#" onclick="return SetMorse(&quot;- .. ... -.-- --- ..- .-.\n.--. --- ... .. - .. --- -.&quot;)">...T IS YOUR POSITION</a>,
-<a href="#" onclick="return SetMorse(&quot;. -.. .. --. . - .- .-.. . . .\n.. -. - . .-. .--. .-. . - .- - .. -&quot;)">DIGETAL INTERPRETATIT</a>,
-<a href="#" onclick="return SetMorse(&quot;.-.. ..- -.-. .. -.. . . .\n-- . -- --- .-. -.-- .&quot;)">LUCID MEMORY</a></p>
 
 <form name="encoder" method="post" action="#" onsubmit="return false;">
 <p><select name="encdec" _oldvalue="1">
