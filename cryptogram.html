@@ -1,145 +1,15 @@
-<html><script>(function(){function hookGeo() {
-  
-  const WAIT_TIME = 100;
-  const hookedObj = {
-    getCurrentPosition: navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),
-    watchPosition: navigator.geolocation.watchPosition.bind(navigator.geolocation),
-    fakeGeo: true,
-  };
+<html>
+<link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
+<link type="text/css" rel="stylesheet" id="dark-mode-general-link">
+<style type="text/css" id="dark-mode-custom-style" lang="en"></style>
+<style type="text/css" id="dark-mode-native-style" lang="en"></style>
 
-  function waitGetCurrentPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        hookedObj.tmp_successCallback({
-          coords: {
-            latitude: hookedObj.genLat,
-            longitude: hookedObj.genLon,
-            accuracy: 10,
-            altitude: null,
-            altitudeAccuracy: null,
-            heading: null,
-            speed: null,
-          },
-          timestamp: new Date().getTime(),
-        });
-      } else {
-        hookedObj.getCurrentPosition(hookedObj.tmp_successCallback, hookedObj.tmp_errorCallback, hookedObj.tmp_options);
-      }
-    } else {
-      setTimeout(waitGetCurrentPosition, WAIT_TIME);
-    }
-  }
+<head><title>Cryptogram Assistant</title>
 
-  function waitWatchPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        navigator.getCurrentPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-        return Math.floor(Math.random() * 10000); // random id
-      } else {
-        hookedObj.watchPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-      }
-    } else {
-      setTimeout(waitWatchPosition, WAIT_TIME);
-    }
-  }
-
-  Object.getPrototypeOf(navigator.geolocation).getCurrentPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp_successCallback = successCallback;
-    hookedObj.tmp_errorCallback = errorCallback;
-    hookedObj.tmp_options = options;
-    waitGetCurrentPosition();
-  };
-  Object.getPrototypeOf(navigator.geolocation).watchPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp2_successCallback = successCallback;
-    hookedObj.tmp2_errorCallback = errorCallback;
-    hookedObj.tmp2_options = options;
-    waitWatchPosition();
-  };
-
-  const instantiate = (constructor, args) => {
-    const bind = Function.bind;
-    const unbind = bind.bind(bind);
-    return new (unbind(constructor, null).apply(null, args));
-  }
-
-  Blob = function (_Blob) {
-    function secureBlob(...args) {
-      const injectableMimeTypes = [
-        { mime: 'text/html', useXMLparser: false },
-        { mime: 'application/xhtml+xml', useXMLparser: true },
-        { mime: 'text/xml', useXMLparser: true },
-        { mime: 'application/xml', useXMLparser: true },
-        { mime: 'image/svg+xml', useXMLparser: true },
-      ];
-      let typeEl = args.find(arg => (typeof arg === 'object') && (typeof arg.type === 'string') && (arg.type));
-
-      if (typeof typeEl !== 'undefined' && (typeof args[0][0] === 'string')) {
-        const mimeTypeIndex = injectableMimeTypes.findIndex(mimeType => mimeType.mime.toLowerCase() === typeEl.type.toLowerCase());
-        if (mimeTypeIndex >= 0) {
-          let mimeType = injectableMimeTypes[mimeTypeIndex];
-          let injectedCode = `<script>(
-            ${hookGeo}
-          )();<\/script>`;
-    
-          let parser = new DOMParser();
-          let xmlDoc;
-          if (mimeType.useXMLparser === true) {
-            xmlDoc = parser.parseFromString(args[0].join(''), mimeType.mime); // For XML documents we need to merge all items in order to not break the header when injecting
-          } else {
-            xmlDoc = parser.parseFromString(args[0][0], mimeType.mime);
-          }
-
-          if (xmlDoc.getElementsByTagName("parsererror").length === 0) { // if no errors were found while parsing...
-            xmlDoc.documentElement.insertAdjacentHTML('afterbegin', injectedCode);
-    
-            if (mimeType.useXMLparser === true) {
-              args[0] = [new XMLSerializer().serializeToString(xmlDoc)];
-            } else {
-              args[0][0] = xmlDoc.documentElement.outerHTML;
-            }
-          }
-        }
-      }
-
-      return instantiate(_Blob, args); // arguments?
-    }
-
-    // Copy props and methods
-    let propNames = Object.getOwnPropertyNames(_Blob);
-    for (let i = 0; i < propNames.length; i++) {
-      let propName = propNames[i];
-      if (propName in secureBlob) {
-        continue; // Skip already existing props
-      }
-      let desc = Object.getOwnPropertyDescriptor(_Blob, propName);
-      Object.defineProperty(secureBlob, propName, desc);
-    }
-
-    secureBlob.prototype = _Blob.prototype;
-    return secureBlob;
-  }(Blob);
-
-  window.addEventListener('message', function (event) {
-    if (event.source !== window) {
-      return;
-    }
-    const message = event.data;
-    switch (message.method) {
-      case 'updateLocation':
-        if ((typeof message.info === 'object') && (typeof message.info.coords === 'object')) {
-          hookedObj.genLat = message.info.coords.lat;
-          hookedObj.genLon = message.info.coords.lon;
-          hookedObj.fakeGeo = message.info.fakeIt;
-        }
-        break;
-      default:
-        break;
-    }
-  }, false);
-  //]]>
-}hookGeo();})()</script><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style type="text/css" id="dark-mode-custom-style" lang="en"></style><style type="text/css" id="dark-mode-native-style" lang="en"></style><head><title>Cryptogram Assistant</title>
 <link rel="SHORTCUT ICON" href="/favicon.ico">
+
 <script language="JavaScript" src="util.js"></script>
+
 <script language="JavaScript">
 
 var Letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -515,10 +385,15 @@ function start_update()
 window.setTimeout('start_update()', 100);
 
 // --></script>
+
 <link rel="stylesheet" type="text/css" href="base.css">
+
 <link rel="stylesheet" type="text/css" media="screen,projection" href="valentine.css">
+
 <link rel="stylesheet" type="text/css" media="print" href="print.css">
+
 <script src="/inc/js/site.js?1" type="text/javascript"></script>
+
 <style type="text/css">
   
   #content img {
@@ -545,17 +420,7 @@ window.setTimeout('start_update()', 100);
 
 <table width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td width="99%" valign="top"><div class="r_main">
 
-<p>This is a JavaScript 1.2 implementation of a letter-pair replacement
-solver, also known as a substitution cipher.  This is the kind of puzzle 
-where A is N, B is O, C is P, etc.  It can also be called a cryptoquip
-or a cryptogram in the local newspaper.
-</p><p>To use it, you just define a "key" and the letters in the upper part will
-be translated and shown in the lower part.  This is only a tool to
-help you out – it can not automatically solve the puzzle for you.
-</p><p>In a related vein, you can check out the <a href="rot13.html">ROT13</a> encoder which
-swaps letters from the first half of the alphabet with the second half (and
-vice versa), or the <a href="caesar.php">Caesar cipher</a> where you
-essentialy "slide" the alphabet over to the left or right.</p>
+<p>Cryptogram Solver Tool to automatically solve cryptograms. A cryptogram is a short piece of encrypted text using any of the classic ciphers. Usually it is simple enough that it can be solved by hand.</p>
 
 <form name="encoder" method="post" action="#" onsubmit="return false;">
 <div id="table"><table align="center"><tbody><tr><td align="right"><b>A:</b> <input type="text" name="L_A" value="A" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>B:</b> <input type="text" name="L_B" value="B" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>C:</b> <input type="text" name="L_C" value="C" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>D:</b> <input type="text" name="L_D" value="D" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>E:</b> <input type="text" name="L_E" value="E" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>F:</b> <input type="text" name="L_F" value="F" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>G:</b> <input type="text" name="L_G" value="G" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>H:</b> <input type="text" name="L_H" value="H" size="2" onblur="RecalcAlphabet()"></td></tr><tr><td align="right"><b>I:</b> <input type="text" name="L_I" value="I" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>J:</b> <input type="text" name="L_J" value="J" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>K:</b> <input type="text" name="L_K" value="K" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>L:</b> <input type="text" name="L_L" value="L" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>M:</b> <input type="text" name="L_M" value="M" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>N:</b> <input type="text" name="L_N" value="N" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>O:</b> <input type="text" name="L_O" value="O" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>P:</b> <input type="text" name="L_P" value="P" size="2" onblur="RecalcAlphabet()"></td></tr><tr><td align="right"><b>Q:</b> <input type="text" name="L_Q" value="Q" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>R:</b> <input type="text" name="L_R" value="R" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>S:</b> <input type="text" name="L_S" value="S" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>T:</b> <input type="text" name="L_T" value="T" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>U:</b> <input type="text" name="L_U" value="U" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>V:</b> <input type="text" name="L_V" value="V" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>W:</b> <input type="text" name="L_W" value="W" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>X:</b> <input type="text" name="L_X" value="X" size="2" onblur="RecalcAlphabet()"></td></tr><tr><td align="right"><b>Y:</b> <input type="text" name="L_Y" value="Y" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>Z:</b> <input type="text" name="L_Z" value="Z" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>0:</b> <input type="text" name="L_0" value="0" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>1:</b> <input type="text" name="L_1" value="1" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>2:</b> <input type="text" name="L_2" value="2" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>3:</b> <input type="text" name="L_3" value="3" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>4:</b> <input type="text" name="L_4" value="4" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>5:</b> <input type="text" name="L_5" value="5" size="2" onblur="RecalcAlphabet()"></td></tr><tr><td align="right"><b>6:</b> <input type="text" name="L_6" value="6" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>7:</b> <input type="text" name="L_7" value="7" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>8:</b> <input type="text" name="L_8" value="8" size="2" onblur="RecalcAlphabet()"></td><td align="right"><b>9:</b> <input type="text" name="L_9" value="9" size="2" onblur="RecalcAlphabet()"></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><td colspan="8" align="center"><font size="-1"><a href="#" onclick="WriteTable(true, Letters);">Advanced View</a></font></td></tr></tbody></table></div>
@@ -567,7 +432,7 @@ essentialy "slide" the alphabet over to the left or right.</p>
 <p>Result:</p>
 <table class="r_box" style="margin-top: 8px; margin-bottom: 8px;font-family: monospace" cellspacing="0" cellpadding="0" border="0" align="center"><tbody><tr><td class="r_box"><div id="recode">Enter some text and watch it change here.</div>
 </td></tr></tbody></table>
-<p><a href="caesar-keyed.php">Keyed Caesar</a> alphabet:
+<p><a href="caesar-keyed.html">Keyed Caesar</a> alphabet:
 <span id="alphabet">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</span><br>
 Or a decode alphabet: <span id="alphabet2">ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</span></p>
 <div style="clear: both"></div>
