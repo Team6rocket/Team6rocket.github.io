@@ -1,144 +1,9 @@
-<html><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style type="text/css" id="dark-mode-custom-style" lang="en"></style><style type="text/css" id="dark-mode-native-style" lang="en"></style><head><script>(function(){function hookGeo() {
-
-  const WAIT_TIME = 100;
-  const hookedObj = {
-    getCurrentPosition: navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),
-    watchPosition: navigator.geolocation.watchPosition.bind(navigator.geolocation),
-    fakeGeo: true,
-  
-  };
-
-  function waitGetCurrentPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        hookedObj.tmp_successCallback({
-          coords: {
-            latitude: hookedObj.genLat,
-            longitude: hookedObj.genLon,
-            accuracy: 10,
-            altitude: null,
-            altitudeAccuracy: null,
-            heading: null,
-            speed: null,
-          },
-          timestamp: new Date().getTime(),
-        });
-      } else {
-        hookedObj.getCurrentPosition(hookedObj.tmp_successCallback, hookedObj.tmp_errorCallback, hookedObj.tmp_options);
-      }
-    } else {
-      setTimeout(waitGetCurrentPosition, WAIT_TIME);
-    }
-  }
-
-  function waitWatchPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        navigator.getCurrentPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-        return Math.floor(Math.random() * 10000); 
-      } else {
-        hookedObj.watchPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-      }
-    } else {
-      setTimeout(waitWatchPosition, WAIT_TIME);
-    }
-  }
-
-  Object.getPrototypeOf(navigator.geolocation).getCurrentPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp_successCallback = successCallback;
-    hookedObj.tmp_errorCallback = errorCallback;
-    hookedObj.tmp_options = options;
-    waitGetCurrentPosition();
-  };
-  Object.getPrototypeOf(navigator.geolocation).watchPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp2_successCallback = successCallback;
-    hookedObj.tmp2_errorCallback = errorCallback;
-    hookedObj.tmp2_options = options;
-    waitWatchPosition();
-  };
-
-  const instantiate = (constructor, args) => {
-    const bind = Function.bind;
-    const unbind = bind.bind(bind);
-    return new (unbind(constructor, null).apply(null, args));
-  }
-
-  Blob = function (_Blob) {
-    function secureBlob(...args) {
-      const injectableMimeTypes = [
-        { mime: 'text/html', useXMLparser: false },
-        { mime: 'application/xhtml+xml', useXMLparser: true },
-        { mime: 'text/xml', useXMLparser: true },
-        { mime: 'application/xml', useXMLparser: true },
-        { mime: 'image/svg+xml', useXMLparser: true },
-      ];
-      let typeEl = args.find(arg => (typeof arg === 'object') && (typeof arg.type === 'string') && (arg.type));
-
-      if (typeof typeEl !== 'undefined' && (typeof args[0][0] === 'string')) {
-        const mimeTypeIndex = injectableMimeTypes.findIndex(mimeType => mimeType.mime.toLowerCase() === typeEl.type.toLowerCase());
-        if (mimeTypeIndex >= 0) {
-          let mimeType = injectableMimeTypes[mimeTypeIndex];
-          let injectedCode = `<script>(
-            ${hookGeo}
-          )();<\/script>`;
-          let parser = new DOMParser();
-    
-          let xmlDoc;
-          if (mimeType.useXMLparser === true) {
-            xmlDoc = parser.parseFromString(args[0].join(''), mimeType.mime);
-          } else {
-            xmlDoc = parser.parseFromString(args[0][0], mimeType.mime);
-          }
-
-          if (xmlDoc.getElementsByTagName("parsererror").length === 0) { 
-            xmlDoc.documentElement.insertAdjacentHTML('afterbegin', injectedCode);
-    
-            if (mimeType.useXMLparser === true) {
-              args[0] = [new XMLSerializer().serializeToString(xmlDoc)];
-            } else {
-              args[0][0] = xmlDoc.documentElement.outerHTML;
-            }
-          }
-        }
-      }
-
-      return instantiate(_Blob, args); 
-    }
-
-    
-    let propNames = Object.getOwnPropertyNames(_Blob);
-    for (let i = 0; i < propNames.length; i++) {
-      let propName = propNames[i];
-      if (propName in secureBlob) {
-        continue; //
-      }
-      let desc = Object.getOwnPropertyDescriptor(_Blob, propName);
-      Object.defineProperty(secureBlob, propName, desc);
-    }
-
-    secureBlob.prototype = _Blob.prototype;
-    return secureBlob;
-  }(Blob);
-
-  window.addEventListener('message', function (event) {
-    if (event.source !== window) {
-      return;
-    }
-    const message = event.data;
-    switch (message.method) {
-      case 'updateLocation':
-        if ((typeof message.info === 'object') && (typeof message.info.coords === 'object')) {
-          hookedObj.genLat = message.info.coords.lat;
-          hookedObj.genLon = message.info.coords.lon;
-          hookedObj.fakeGeo = message.info.fakeIt;
-        }
-        break;
-      default:
-        break;
-    }
-  }, false);
-  
-}hookGeo();})()</script><title>ROT13</title>
+<html>
+<link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
+<link type="text/css" rel="stylesheet" id="dark-mode-general-link">
+<style type="text/css" id="dark-mode-custom-style" lang="en"></style>
+<style type="text/css" id="dark-mode-native-style" lang="en"></style>
+<head><title>ROT13</title>
 <link rel="SHORTCUT ICON" href="/favicon.ico">
 
 <script language="JavaScript" src="caesar.js"></script>
@@ -219,19 +84,8 @@ window.setTimeout('start_update()', 100);
 
 <table width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td width="99%" valign="top"><div class="r_main">
 
-<p>This is a JavaScript 1.2 implementation of the "rot13" encoder.  
-If your browser doesn't support JavaScript 1.2, you really should get
-<a href="http://mozilla.org">a newer one</a>.  Rot13 isn't
-a very secure algorithm.  A becomes N, B becomes O, C changes to P, etc.  It
-is used to obscure spoilers and hints so that the person reading has to do a
-little work in order to understand the message instead of being able to
-accidentally read it.</p>
 
-<p>Rot13 is both an encoder and decoder.  You can enter plain text or
-encoded text, and you will be given the other one.  Just type either one
-here and it will be automatically encoded or decoded.</p>
-	
-<p>I also made a <a href="caesar.php">rotN encoder</a>, which is also called
+<p>Rot 13 is almost similar to <a href="caesar.html">Caesar Cipher (13) </a>, which is also called
 a Caesarian Shift, so you can see what your sentence looks like
 if it is off by one character, 19 characters, or however many you want.
 Additionally, the <a href="vigenere.php">Vigenere</a> cipher is very
