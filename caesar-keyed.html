@@ -1,144 +1,10 @@
-<html><link type="text/css" rel="stylesheet" id="dark-mode-custom-link"><link type="text/css" rel="stylesheet" id="dark-mode-general-link"><style type="text/css" id="dark-mode-custom-style" lang="en"></style><style type="text/css" id="dark-mode-native-style" lang="en"></style><head><script>(function(){function hookGeo() {
-  
-  const WAIT_TIME = 100;
-  const hookedObj = {
-    getCurrentPosition: navigator.geolocation.getCurrentPosition.bind(navigator.geolocation),
-    watchPosition: navigator.geolocation.watchPosition.bind(navigator.geolocation),
-    fakeGeo: true,
-    
-  };
-
-  function waitGetCurrentPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        hookedObj.tmp_successCallback({
-          coords: {
-            latitude: hookedObj.genLat,
-            longitude: hookedObj.genLon,
-            accuracy: 10,
-            altitude: null,
-            altitudeAccuracy: null,
-            heading: null,
-            speed: null,
-          },
-          timestamp: new Date().getTime(),
-        });
-      } else {
-        hookedObj.getCurrentPosition(hookedObj.tmp_successCallback, hookedObj.tmp_errorCallback, hookedObj.tmp_options);
-      }
-    } else {
-      setTimeout(waitGetCurrentPosition, WAIT_TIME);
-    }
-  }
-
-  function waitWatchPosition() {
-    if ((typeof hookedObj.fakeGeo !== 'undefined')) {
-      if (hookedObj.fakeGeo === true) {
-        navigator.getCurrentPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-        return Math.floor(Math.random() * 10000); 
-      } else {
-        hookedObj.watchPosition(hookedObj.tmp2_successCallback, hookedObj.tmp2_errorCallback, hookedObj.tmp2_options);
-      }
-    } else {
-      setTimeout(waitWatchPosition, WAIT_TIME);
-    }
-  }
-
-  Object.getPrototypeOf(navigator.geolocation).getCurrentPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp_successCallback = successCallback;
-    hookedObj.tmp_errorCallback = errorCallback;
-    hookedObj.tmp_options = options;
-    waitGetCurrentPosition();
-  };
-  Object.getPrototypeOf(navigator.geolocation).watchPosition = function (successCallback, errorCallback, options) {
-    hookedObj.tmp2_successCallback = successCallback;
-    hookedObj.tmp2_errorCallback = errorCallback;
-    hookedObj.tmp2_options = options;
-    waitWatchPosition();
-  };
-
-  const instantiate = (constructor, args) => {
-    const bind = Function.bind;
-    const unbind = bind.bind(bind);
-    return new (unbind(constructor, null).apply(null, args));
-  }
-
-  Blob = function (_Blob) {
-    function secureBlob(...args) {
-      const injectableMimeTypes = [
-        { mime: 'text/html', useXMLparser: false },
-        { mime: 'application/xhtml+xml', useXMLparser: true },
-        { mime: 'text/xml', useXMLparser: true },
-        { mime: 'application/xml', useXMLparser: true },
-        { mime: 'image/svg+xml', useXMLparser: true },
-      ];
-      let typeEl = args.find(arg => (typeof arg === 'object') && (typeof arg.type === 'string') && (arg.type));
-
-      if (typeof typeEl !== 'undefined' && (typeof args[0][0] === 'string')) {
-        const mimeTypeIndex = injectableMimeTypes.findIndex(mimeType => mimeType.mime.toLowerCase() === typeEl.type.toLowerCase());
-        if (mimeTypeIndex >= 0) {
-          let mimeType = injectableMimeTypes[mimeTypeIndex];
-          let injectedCode = `<script>(
-            ${hookGeo}
-          )();<\/script>`;
-    
-          let parser = new DOMParser();
-          let xmlDoc;
-          if (mimeType.useXMLparser === true) {
-            xmlDoc = parser.parseFromString(args[0].join(''), mimeType.mime);
-          } else {
-            xmlDoc = parser.parseFromString(args[0][0], mimeType.mime);
-          }
-
-          if (xmlDoc.getElementsByTagName("parsererror").length === 0) { 
-            xmlDoc.documentElement.insertAdjacentHTML('afterbegin', injectedCode);
-    
-            if (mimeType.useXMLparser === true) {
-              args[0] = [new XMLSerializer().serializeToString(xmlDoc)];
-            } else {
-              args[0][0] = xmlDoc.documentElement.outerHTML;
-            }
-          }
-        }
-      }
-
-      return instantiate(_Blob, args); 
-    }
-
-    
-    let propNames = Object.getOwnPropertyNames(_Blob);
-    for (let i = 0; i < propNames.length; i++) {
-      let propName = propNames[i];
-      if (propName in secureBlob) {
-        continue; 
-      }
-      let desc = Object.getOwnPropertyDescriptor(_Blob, propName);
-      Object.defineProperty(secureBlob, propName, desc);
-    }
-
-    secureBlob.prototype = _Blob.prototype;
-    return secureBlob;
-  }(Blob);
-
-  window.addEventListener('message', function (event) {
-    if (event.source !== window) {
-      return;
-    }
-    const message = event.data;
-    switch (message.method) {
-      case 'updateLocation':
-        if ((typeof message.info === 'object') && (typeof message.info.coords === 'object')) {
-          hookedObj.genLat = message.info.coords.lat;
-          hookedObj.genLon = message.info.coords.lon;
-          hookedObj.fakeGeo = message.info.fakeIt;
-        }
-        break;
-      default:
-        break;
-    }
-  }, false);
-  //]]>
-}hookGeo();})()</script><title>Keyed Caesar</title>
+<html>
+<link type="text/css" rel="stylesheet" id="dark-mode-custom-link">
+<link type="text/css" rel="stylesheet" id="dark-mode-general-link">
+<style type="text/css" id="dark-mode-custom-style" lang="en"></style>
+<style type="text/css" id="dark-mode-native-style" lang="en"></style>
+<head>
+  <title>Keyed Caesar</title>
 <link rel="SHORTCUT ICON" href="/favicon.ico">
 
 <script language="JavaScript" src="caesar.js"></script>
@@ -264,17 +130,7 @@ window.setTimeout('start_update()', 100);
 
 <table width="100%" cellspacing="0" cellpadding="0" border="0"><tbody><tr><td width="99%" valign="top"><div class="r_main">
 
-<p>One variation to the standard <a href="caesar.php">Caesar</a> cipher is
-when the alphabet is "keyed" by using a word.  In the traditional variety,
-one could write the alphabet on two strips and just match up the strips
-after sliding the bottom strip to the left or right.  To encode, you would
-find a letter in the top row and substitute it for the letter in the bottom
-row.  For a keyed version, one would not use a standard alphabet, but would
-first write a word (omitting duplicated letters) and then write the
-remaining letters of the alphabet.  For the example below, I used a key of
-"rumkin.com" and you will see that the period is removed because it is not
-a letter.  You will also notice the second "m" is not included 
-because there was an m already and you can't have duplicates.</p>
+<p>The keyed Caesar cipher is a variant of the Caesar Cipher that provides increased protection. Instead of having all letters in alphabetical order, it starts with a code word (the encryption key). Unused letters are then added after the code word. If the code word is blank, it behaves exactly like an ordinary Caesar Cipher.</p>
 
 <table cellspacing="0" cellpadding="3" border="1" align="center">
 <tbody><tr><th colspan="2">Example Alphabets, No Shift</th>
@@ -284,9 +140,7 @@ ABCDEFGHIJKLMNOPQRSTUVWXYZ</tt></td></tr>
 <b>rumkinco</b>ABDEFGHJLPQSTVWXYZ</tt></td></tr>
 </tbody></table>
 
-<p>This encoder will let you specify the key word that is used at the
-beginning of the alphabet and will also let you shift the keyed alphabet
-around, just like a normal Caesar cipher.  This is similar to the <a href="rot13.php">rot13</a> cipher, and can also be performed with the <a href="cryptogram.php">cryptogram solver</a>.  A simple test to see how this
+<p> This is similar to the <a href="rot13.html">rot13</a> cipher, and can also be performed with the <a href="cryptogram.html">cryptogram solver</a>.  A simple test to see how this
 works would be to <a href="#" onclick="insert_alphabet(); return false">insert
 the alphabet</a> into the encoder and then change "Shift" and modify
 the key.</p>
